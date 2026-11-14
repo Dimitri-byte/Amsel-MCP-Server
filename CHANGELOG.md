@@ -17,4 +17,4 @@ First public release.
 - `amsel-adventure-writer` Claude skill for writing playable scenes, NPCs and Lore pages.
 - English and French documentation.
 
-[0.1.0]: https://github.com/Dimitri-byte/Amsel-MCP-Server-/releases/tag/v0.1.0
+[0.1.0]: https://github.com/Dimitri-byte/Amsel-MCP-Server/releases/tag/v0.1.0

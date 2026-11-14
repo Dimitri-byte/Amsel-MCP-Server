@@ -22,9 +22,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Dimitri-byte/Amsel-MCP-Server-"
-Issues = "https://github.com/Dimitri-byte/Amsel-MCP-Server-/issues"
-Changelog = "https://github.com/Dimitri-byte/Amsel-MCP-Server-/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/Dimitri-byte/Amsel-MCP-Server"
+Issues = "https://github.com/Dimitri-byte/Amsel-MCP-Server/issues"
+Changelog = "https://github.com/Dimitri-byte/Amsel-MCP-Server/blob/main/CHANGELOG.md"
 
 [project.scripts]
 amsel-mcp = "amsel_mcp.server:main"

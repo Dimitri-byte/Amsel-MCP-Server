@@ -1,6 +1,6 @@
 # Amsel MCP Server
 
-[![Tests](https://github.com/Dimitri-byte/Amsel-MCP-Server-/actions/workflows/tests.yml/badge.svg)](https://github.com/Dimitri-byte/Amsel-MCP-Server-/actions/workflows/tests.yml)
+[![Tests](https://github.com/Dimitri-byte/Amsel-MCP-Server/actions/workflows/tests.yml/badge.svg)](https://github.com/Dimitri-byte/Amsel-MCP-Server/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 *[Version française](README.fr.md)*
@@ -71,8 +71,8 @@ ln -s "$PWD/skills/amsel-adventure-writer" ~/.claude/skills/amsel-adventure-writ
 Requirements: [uv](https://docs.astral.sh/uv/) (it installs Python 3.10+ for you).
 
 ```bash
-git clone https://github.com/Dimitri-byte/Amsel-MCP-Server-.git
-cd Amsel-MCP-Server-
+git clone https://github.com/Dimitri-byte/Amsel-MCP-Server.git
+cd Amsel-MCP-Server
 uv sync
 ```
 
@@ -83,7 +83,7 @@ uv sync
 ### Claude Code
 
 ```bash
-claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents" -- uv run --directory /path/to/Amsel-MCP-Server- amsel-mcp
+claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents" -- uv run --directory /path/to/Amsel-MCP-Server amsel-mcp
 ```
 
 Add `-e AMSEL_WRITE=1` to enable the write tools.
@@ -97,7 +97,7 @@ In `claude_desktop_config.json`:
   "mcpServers": {
     "amsel": {
       "command": "uv",
-      "args": ["run", "--directory", "/path/to/Amsel-MCP-Server-", "amsel-mcp"],
+      "args": ["run", "--directory", "/path/to/Amsel-MCP-Server", "amsel-mcp"],
       "env": { "AMSEL_PATHS": "/home/me/Documents" }
     }
   }

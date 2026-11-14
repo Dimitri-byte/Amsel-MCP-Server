@@ -1,6 +1,6 @@
 # Amsel MCP Server
 
-[![Tests](https://github.com/Dimitri-byte/Amsel-MCP-Server-/actions/workflows/tests.yml/badge.svg)](https://github.com/Dimitri-byte/Amsel-MCP-Server-/actions/workflows/tests.yml)
+[![Tests](https://github.com/Dimitri-byte/Amsel-MCP-Server/actions/workflows/tests.yml/badge.svg)](https://github.com/Dimitri-byte/Amsel-MCP-Server/actions/workflows/tests.yml)
 [![Licence : MIT](https://img.shields.io/badge/Licence-MIT-blue.svg)](LICENSE)
 
 *[English version](README.md)*
@@ -71,8 +71,8 @@ ln -s "$PWD/skills/amsel-adventure-writer" ~/.claude/skills/amsel-adventure-writ
 Prérequis : [uv](https://docs.astral.sh/uv/) (il installe Python 3.10+ pour toi).
 
 ```bash
-git clone https://github.com/Dimitri-byte/Amsel-MCP-Server-.git
-cd Amsel-MCP-Server-
+git clone https://github.com/Dimitri-byte/Amsel-MCP-Server.git
+cd Amsel-MCP-Server
 uv sync
 ```
 
@@ -83,7 +83,7 @@ La variable `AMSEL_PATHS` indique où chercher les fichiers (plusieurs dossiers 
 ### Claude Code
 
 ```bash
-claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents" -- uv run --directory /chemin/vers/Amsel-MCP-Server- amsel-mcp
+claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents" -- uv run --directory /chemin/vers/Amsel-MCP-Server amsel-mcp
 ```
 
 Ajoute `-e AMSEL_WRITE=1` pour activer les outils d'écriture.
@@ -97,7 +97,7 @@ Dans `claude_desktop_config.json` :
   "mcpServers": {
     "amsel": {
       "command": "uv",
-      "args": ["run", "--directory", "/chemin/vers/Amsel-MCP-Server-", "amsel-mcp"],
+      "args": ["run", "--directory", "/chemin/vers/Amsel-MCP-Server", "amsel-mcp"],
       "env": { "AMSEL_PATHS": "/home/moi/Documents" }
     }
   }

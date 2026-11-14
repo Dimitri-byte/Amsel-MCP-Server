@@ -36,8 +36,8 @@ Close and reopen the terminal so that `uv` is found.
 ## 2. Get the code and install the dependencies
 
 ```bash
-git clone https://github.com/Dimitri-byte/Amsel-MCP-Server-.git
-cd Amsel-MCP-Server-
+git clone https://github.com/Dimitri-byte/Amsel-MCP-Server.git
+cd Amsel-MCP-Server
 uv sync
 ```
 
@@ -80,14 +80,14 @@ npx @modelcontextprotocol/inspector -e AMSEL_PATHS="$HOME/Documents" -- uv run -
 
 ## 5. Connect the server to Claude
 
-In the examples, replace `/path/to/Amsel-MCP-Server-` with the real path (given by `pwd` in the project folder).
+In the examples, replace `/path/to/Amsel-MCP-Server` with the real path (given by `pwd` in the project folder).
 
 ### Option A — Claude Code, with the `claude` command
 
 ```bash
 claude mcp add --scope user amsel \
   -e AMSEL_PATHS="$HOME/Documents" \
-  -- uv run --directory /path/to/Amsel-MCP-Server- amsel-mcp
+  -- uv run --directory /path/to/Amsel-MCP-Server amsel-mcp
 ```
 
 - `--scope user`: available in all your projects. Without it, only in the current folder.
@@ -137,7 +137,7 @@ The command above only writes this to `~/.claude.json` (the `mcpServers` key at 
     "amsel": {
       "type": "stdio",
       "command": "uv",
-      "args": ["run", "--directory", "/path/to/Amsel-MCP-Server-", "amsel-mcp"],
+      "args": ["run", "--directory", "/path/to/Amsel-MCP-Server", "amsel-mcp"],
       "env": { "AMSEL_PATHS": "/home/me/Documents" }
     }
   }
@@ -163,7 +163,7 @@ Add:
   "mcpServers": {
     "amsel": {
       "command": "uv",
-      "args": ["run", "--directory", "/path/to/Amsel-MCP-Server-", "amsel-mcp"],
+      "args": ["run", "--directory", "/path/to/Amsel-MCP-Server", "amsel-mcp"],
       "env": { "AMSEL_PATHS": "/home/me/Documents" }
     }
   }
@@ -177,7 +177,7 @@ Then **fully quit** Claude Desktop and start it again.
 By default the server only **reads**. To let Claude create and edit pages too, add the **`AMSEL_WRITE=1`** variable to the registration. With the `claude` command (after removing the old registration, see section 8):
 
 ```bash
-claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents/RPG-copies" -e AMSEL_WRITE=1 -- uv run --directory /path/to/Amsel-MCP-Server- amsel-mcp
+claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents/RPG-copies" -e AMSEL_WRITE=1 -- uv run --directory /path/to/Amsel-MCP-Server amsel-mcp
 ```
 
 Or by hand, in the `"env"` block: `"AMSEL_WRITE": "1"`.
@@ -232,7 +232,7 @@ claude mcp remove amsel -s user
 Then register the new one, with the new folder or the new project path:
 
 ```bash
-claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents" -- uv run --directory /path/to/Amsel-MCP-Server- amsel-mcp
+claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents" -- uv run --directory /path/to/Amsel-MCP-Server amsel-mcp
 ```
 
 Several folders at once: `-e AMSEL_PATHS="$HOME/Documents:$HOME/Nextcloud/RPG"`.

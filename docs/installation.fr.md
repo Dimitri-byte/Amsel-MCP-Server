@@ -36,8 +36,8 @@ Ferme puis rouvre le terminal pour que `uv` soit trouvé.
 ## 2. Récupérer le code et installer les dépendances
 
 ```bash
-git clone https://github.com/Dimitri-byte/Amsel-MCP-Server-.git
-cd Amsel-MCP-Server-
+git clone https://github.com/Dimitri-byte/Amsel-MCP-Server.git
+cd Amsel-MCP-Server
 uv sync
 ```
 
@@ -80,14 +80,14 @@ npx @modelcontextprotocol/inspector -e AMSEL_PATHS="$HOME/Documents" -- uv run -
 
 ## 5. Brancher le serveur sur Claude
 
-Dans les exemples, remplace `/chemin/vers/Amsel-MCP-Server-` par le chemin réel (donné par `pwd` dans le dossier du projet).
+Dans les exemples, remplace `/chemin/vers/Amsel-MCP-Server` par le chemin réel (donné par `pwd` dans le dossier du projet).
 
 ### Option A — Claude Code, avec la commande `claude`
 
 ```bash
 claude mcp add --scope user amsel \
   -e AMSEL_PATHS="$HOME/Documents" \
-  -- uv run --directory /chemin/vers/Amsel-MCP-Server- amsel-mcp
+  -- uv run --directory /chemin/vers/Amsel-MCP-Server amsel-mcp
 ```
 
 - `--scope user` : disponible dans tous tes projets. Sans cette option, seulement dans le dossier courant.
@@ -137,7 +137,7 @@ La commande ci-dessus ne fait qu'écrire ceci dans `~/.claude.json` (clé `mcpSe
     "amsel": {
       "type": "stdio",
       "command": "uv",
-      "args": ["run", "--directory", "/chemin/vers/Amsel-MCP-Server-", "amsel-mcp"],
+      "args": ["run", "--directory", "/chemin/vers/Amsel-MCP-Server", "amsel-mcp"],
       "env": { "AMSEL_PATHS": "/home/moi/Documents" }
     }
   }
@@ -163,7 +163,7 @@ Ajoute :
   "mcpServers": {
     "amsel": {
       "command": "uv",
-      "args": ["run", "--directory", "/chemin/vers/Amsel-MCP-Server-", "amsel-mcp"],
+      "args": ["run", "--directory", "/chemin/vers/Amsel-MCP-Server", "amsel-mcp"],
       "env": { "AMSEL_PATHS": "/home/moi/Documents" }
     }
   }
@@ -177,7 +177,7 @@ Puis **quitte complètement** Claude Desktop et relance-le.
 Par défaut, le serveur ne fait que **lire**. Pour que Claude puisse aussi créer et modifier des pages, ajoute la variable **`AMSEL_WRITE=1`** à l'enregistrement. Avec la commande `claude` (après avoir supprimé l'ancien enregistrement, voir la section 8) :
 
 ```bash
-claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents/JDR-copies" -e AMSEL_WRITE=1 -- uv run --directory /chemin/vers/Amsel-MCP-Server- amsel-mcp
+claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents/JDR-copies" -e AMSEL_WRITE=1 -- uv run --directory /chemin/vers/Amsel-MCP-Server amsel-mcp
 ```
 
 Ou à la main, dans le bloc `"env"` : `"AMSEL_WRITE": "1"`.
@@ -232,7 +232,7 @@ claude mcp remove amsel -s user
 Puis enregistrer le nouveau, avec le nouveau dossier ou le nouveau chemin du projet :
 
 ```bash
-claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents" -- uv run --directory /chemin/vers/Amsel-MCP-Server- amsel-mcp
+claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents" -- uv run --directory /chemin/vers/Amsel-MCP-Server amsel-mcp
 ```
 
 Plusieurs dossiers à la fois : `-e AMSEL_PATHS="$HOME/Documents:$HOME/Nextcloud/JDR"`.

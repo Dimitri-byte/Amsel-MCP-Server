@@ -5,8 +5,8 @@ Thanks for your interest! Bug reports, format discoveries and pull requests are 
 ## Development setup
 
 ```bash
-git clone https://github.com/Dimitri-byte/Amsel-MCP-Server-.git
-cd Amsel-MCP-Server-
+git clone https://github.com/Dimitri-byte/Amsel-MCP-Server.git
+cd Amsel-MCP-Server
 uv sync
 uv run pytest
 ```
