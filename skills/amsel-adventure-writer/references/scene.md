@@ -26,15 +26,24 @@ Typical length: 400 to 1,200 words. A longer scene is often two scenes.
 
 ## Choices and arcanes
 
-Amsel models important decisions with **arcanes** (choices and destinies), which the server cannot create yet. When the scene holds a real branch, write it visibly:
+Amsel tracks what happens at the table with **arcanes**, embedded in the scene. Put each one on its own line in the content; the server creates it with an empty result for every game session:
+
+- `[[choice: Do the PCs hand Vessa over?]]` — a yes/no decision.
+- `[[destiny: The Broker learns where the PCs are hiding]]` — an event whose outcome the GM rates from 1 to 5.
+- `[[role: One PC must win over the dockmaster]]` — a task the GM assigns to characters in Amsel.
+- `[[options: How do the PCs leave the station? | Quietly | By force | With a forged pass]]` — the text, then at least two options.
+- `[[count: Station alert level]]` — a counter that starts at 0.
+
+Use them for what really matters to the story — a scene usually needs one or two, not five. Explain the consequences next to the arcane, so the GM knows what each outcome changes:
 
 ```
 #### Choice: hand Vessa over or protect her?
+[[choice: Do the PCs hand Vessa over to the Broker?]]
 - **Hand her over**: the Broker pays, but [[NPC: Orrin]] hears about it and grows wary.
 - **Protect her**: Vessa becomes an ally; the bounty on the PCs doubles.
 ```
 
-…and add it to the "To do in Amsel" list in your report, so the GM creates the matching arcane.
+When the scene already has arcanes, `read_tome_page` shows them as `[[choice#1041e488: …]]`: keep those lines unchanged when rewriting the scene, or the arcane and its session results are detached from it.
 
 ## Example
 

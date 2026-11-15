@@ -247,7 +247,11 @@ class Context:
                 txt = html_to_text(a.get("text"), self.label).replace("\n", " ").replace("[[", "").replace("]]", "")
             finally:
                 self._arcane_depth -= 1
-            return f"{a['type']}: {txt[:80]}{'…' if len(txt) > 80 else ''}"
+            txt = f"{txt[:80]}{'…' if len(txt) > 80 else ''}"
+            if a["type"] == "options":
+                res = (a.get("results") or [{}])[0]
+                txt = " | ".join([txt] + [c.get("content", "") for c in res.get("choices", [])])
+            return f"{a['type']}#{ref[:8]}: {txt}".rstrip(": ")
         return None
 
     def name_of_id(self, ref: str) -> str:

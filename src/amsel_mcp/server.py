@@ -26,7 +26,7 @@ _WRITE_HELP = (
     " Write tools are enabled: they create or update pages and notes. Text uses light Markdown "
     "(one paragraph per line, **bold**, *italic*, '### '/'#### ' headings, '---' separators, '- ' or "
     "'1. ' lists nested by 2-space indent, '> ' quotes) and [[Page name]] links to "
-    "existing pages. Images come from local files (set_lore_page_image, set_tome_page_image). Every write is refused while the Tome/Lore app is open, and a backup is kept in "
+    "existing pages. In scene content, a line '[[choice: question]]' (or destiny, role, count, '[[options: text | a | b]]') creates an arcane. Images come from local files (set_lore_page_image, set_tome_page_image). Every write is refused while the Tome/Lore app is open, and a backup is kept in "
     ".amsel-backups/ next to the file. Read the page first, and confirm with the user before writing."
     if WRITE_ENABLED else " Write tools are disabled (set AMSEL_WRITE=1 to enable them)."
 )
@@ -144,11 +144,11 @@ def read_tome_page(tome: str, page: str) -> str:
 
 @tool
 def list_tome_arcanes(tome: str, arcane_type: str | None = None) -> str:
-    """List a Tome's arcanes (planned 'choice' and 'destiny' events) with their results per session.
+    """List a Tome's arcanes (choice, destiny, role, options, count) with their results per session.
 
     Args:
         tome: Tome file name, partial name or path.
-        arcane_type: optional filter: "choice" or "destiny".
+        arcane_type: optional filter: "choice", "destiny", "role", "options" or "count".
     """
     t = ws.tome(tome)
     return render.tome_arcanes(t, ws.linked_lore(t), arcane_type)
@@ -253,7 +253,7 @@ def create_tome_story_page(tome: str, parent: str, name: str, page_type: str = "
         name: page name.
         page_type: "Scene" or "Chapter".
         summary: optional summary text.
-        content: optional scene text (scenes only).
+        content: optional scene text (scenes only). A line holding only [[choice: question]], [[destiny: event]], [[role: task]], [[options: text | option 1 | option 2]] or [[count: label]] inserts a new arcane; [[choice#1041e488: …]] (id as shown by read_tome_page) keeps an existing one.
     """
     return Editor(ws).create_tome_story_page(tome, parent, name, page_type, summary, content)
 
@@ -269,7 +269,7 @@ def update_tome_page(tome: str, page: str, new_name: str | None = None, summary:
         page: page name, partial name or id.
         new_name: new page name.
         summary: new summary text.
-        content: new scene text (scenes only).
+        content: new scene text (scenes only); arcane lines as in create_tome_story_page. When replacing content, keep the existing arcanes' [[type#id: …]] lines or they are detached from the scene.
         sections: data pages only, {section title: text}; a missing text section is created.
         append: add the text after the existing text instead of replacing it.
     """

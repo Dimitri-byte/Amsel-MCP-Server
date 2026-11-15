@@ -15,7 +15,7 @@ from pathlib import Path
 
 from . import render
 from .archive import read_data_json
-from .compose import text_to_html
+from .compose import inline_html, text_to_html
 from .model import Lore, PageNotFound, Tome, find_one
 from .text import normalize
 from .workspace import Workspace
@@ -172,6 +172,34 @@ class Editor:
         lore = self.ws.linked_lore(tome)
         return tome, lore, self._finder(tome, lore)
 
+    @staticmethod
+    def _arcane_maker(s: Session, find):
+        """Hook for text_to_html: reuse an arcane by id prefix, or create one with an empty result per session."""
+        def make(kind: str, ref: str | None, text: str, options: list[str]) -> str:
+            arcanes = s.data.setdefault("arcanes", [])
+            if ref:
+                hits = [a for a in arcanes if a["idHash"].startswith(ref.lower())]
+                if len(hits) != 1:
+                    raise ValueError("no arcane with this id" if not hits else "ambiguous arcane id")
+                if hits[0].get("type") != kind:
+                    raise ValueError(f"arcane {ref} is a {hits[0].get('type')}, not a {kind}")
+                return hits[0]["idHash"]
+            if kind in ("choice", "destiny", "role") and not text:
+                raise ValueError(f"a {kind} arcane needs a text")
+            if kind == "options" and len(options) < 2:
+                raise ValueError("an options arcane needs at least two options: [[options: text | option 1 | option 2]]")
+            choices = [{"idHash": new_id(), "content": o, "isSelected": False} for o in options]
+            blank = {"choice": {"state": "tbd"}, "destiny": {"mood": 0}, "role": {"characters": []},
+                     "options": {"choices": choices}, "count": {"number": 0}}[kind]
+            sessions = [g["idHash"] for g in s.data.get("gameSessions", [])]
+            arc = {"idHash": new_id(), "text": f"<p>{inline_html(text, find)}</p>" if text else "", "type": kind,
+                   "results": [{"relatedSessionIdHash": sid, "commentary": "",
+                                **{k: (list(map(dict, v)) if isinstance(v, list) else v) for k, v in blank.items()}}
+                               for sid in sessions]}
+            arcanes.append(arc)
+            return arc["idHash"]
+        return make
+
     def _done(self, s: Session, rendered_after) -> str:
         bak = s.commit()
         return f"{rendered_after()}\n\n---\nSaved {s.path.name}. Backup of the previous version: {bak}"
@@ -214,7 +242,7 @@ class Editor:
             "pageName": name.strip(), "type": code, "parentId": par["idHash"], "pageStates": [], "aliases": [],
         }
         if code == "TSP_Scene":
-            page["content"] = text_to_html(content, find)
+            page["content"] = text_to_html(content, find, self._arcane_maker(s, find))
         else:
             page["childrenIds"] = []
         s.data["storyPages"].append(page)
@@ -239,7 +267,7 @@ class Editor:
         if content is not None:
             if page.get("type") != "TSP_Scene":
                 raise ValueError("Only scenes have a content field; use summary or sections.")
-            page["content"] = _join(page.get("content"), text_to_html(content, find), append)
+            page["content"] = _join(page.get("content"), text_to_html(content, find, self._arcane_maker(s, find)), append)
         if sections:
             if is_story:
                 raise ValueError("Story pages have no sections; use summary or content.")

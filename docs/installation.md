@@ -182,6 +182,9 @@ claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents/RPG-copies" -e
 
 Or by hand, in the `"env"` block: `"AMSEL_WRITE": "1"`.
 
+> [!CAUTION]
+> **Always back up your `.tome` and `.lore` files before enabling writing and before every work session.** The automatic backups in `.amsel-backups/` do not replace a copy of your own.
+
 Before writing:
 
 - **Close the Tome app** before editing a `.tome`, and **Lore** before editing a `.lore`. Otherwise the server refuses: Amsel keeps the file in memory and would overwrite the change on its next save.

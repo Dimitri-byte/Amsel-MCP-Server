@@ -29,7 +29,7 @@ def test_data_pages_grouped_in_app_order(server):
 def test_read_story_page_resolves_tome_lore_and_arcane_links(server):
     out = server.read_tome_page("campagne", "arrivee")  # accent-insensitive partial name
     assert "Les héros rencontrent [[PNJ : Mirelle]] à [[Écume]]." in out
-    assert "[[choice: Trahir PNJ : Mirelle ?]]" in out
+    assert "[[choice#ta000001: Trahir PNJ : Mirelle ?]]" in out
     assert "parent: [[Chapitre 1]]" in out
 
 

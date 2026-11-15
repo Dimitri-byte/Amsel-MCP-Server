@@ -71,12 +71,15 @@ The text passed to the tools is light Markdown, converted to Amsel's format:
 | `- item`, `1. item`, indented by 2 spaces for a sub-list | lists |
 | `> text` | quote block |
 | `[[Exact page name]]` | link to an existing Tome or Lore page (shown with the page's name; there is no custom link text) |
+| a line `[[choice: …]]`, `[[destiny: …]]`, `[[role: …]]`, `[[options: text \| a \| b]]`, `[[count: …]]` | a new arcane, in scene content only (see `references/scene.md`) |
 
 No tables or web links in the text: write them differently. Images are set separately, from a local file, with `set_lore_page_image` (image module of a Lore page) or `set_tome_page_image` (cover of a Tome page). Ask the GM before downloading any image from the web.
 
 ## 5. Current server limits
 
-The server cannot (yet): create arcanes (choices/destinies), fill runes or relations, delete a page, or write to a "checklist" section. When the adventure needs them, write the equivalent as text and end your report with a "To do in Amsel" list (e.g. "create the choice arcane *Hand Vessa over or protect her?* in scene X").
+The server cannot (yet): set the results of existing arcanes, fill runes or relations, delete a page, or write to a "checklist" section. When the adventure needs them, write the equivalent as text and end your report with a "To do in Amsel" list (e.g. "assign the role arcane of scene X to Thessaly").
+
+When you rewrite a scene that already has arcanes, keep their `[[type#id: …]]` lines exactly as `read_tome_page` shows them: the id keeps the arcane and its session results.
 
 ## 6. Final report
 

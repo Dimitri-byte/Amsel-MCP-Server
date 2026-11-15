@@ -2,6 +2,14 @@
 
 All notable changes to this project are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- Arcane creation in scene content: `[[choice: …]]`, `[[destiny: …]]`, `[[role: …]]`, `[[options: text | a | b]]`, `[[count: …]]`, each with an empty result per game session.
+- Reading of role, options and count arcanes; arcanes are shown with their id (`[[choice#1041e488: …]]`) so a rewritten scene keeps them.
+- Prominent warning in the README to back up files before any change.
+
 ## [0.1.0] - 2026-11-14
 
 First public release.

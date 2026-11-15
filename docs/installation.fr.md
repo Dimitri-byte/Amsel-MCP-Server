@@ -182,6 +182,9 @@ claude mcp add --scope user amsel -e AMSEL_PATHS="$HOME/Documents/JDR-copies" -e
 
 Ou à la main, dans le bloc `"env"` : `"AMSEL_WRITE": "1"`.
 
+> [!CAUTION]
+> **Fais toujours une sauvegarde de tes fichiers `.tome` et `.lore` avant d'activer l'écriture et avant chaque séance de travail.** Les sauvegardes automatiques de `.amsel-backups/` ne remplacent pas ta propre copie.
+
 À savoir avant d'écrire :
 
 - **Ferme l'application Tome** avant de modifier un `.tome`, et **Lore** avant de modifier un `.lore`. Sinon le serveur refuse : Amsel garde le fichier en mémoire et écraserait la modification à sa prochaine sauvegarde.

@@ -12,6 +12,15 @@ Claude can browse your campaign tree, read an NPC or a Lore page, follow links b
 > Community project, not affiliated with or endorsed by Ollam Technologies, the makers of Amsel Suite.
 > The file format was reverse-engineered and may change with new Amsel versions: **work on copies first**.
 
+> [!CAUTION]
+> ## ⚠️ ALWAYS BACK UP YOUR FILES BEFORE ANY CHANGE ⚠️
+>
+> **Before enabling the write tools, and before every work session with them, copy your `.tome` and `.lore` files somewhere safe** (another folder, an external drive, cloud storage).
+>
+> The server writes directly into your real campaign files. It keeps automatic backups in `.amsel-backups/`, but only the last 20 versions, next to the file itself: they do not replace a backup of your own. The Amsel file format is undocumented and reverse-engineered, and a new Amsel version may change it.
+>
+> **No backup, no writing.** Start with copies, check the result in Amsel, then work on your real files.
+
 ## Read tools (always available)
 
 | Tool | Purpose |
@@ -33,7 +42,7 @@ Claude can browse your campaign tree, read an NPC or a Lore page, follow links b
 | Tool | Purpose |
 |---|---|
 | `create_tome_data_page` | Creates a data page (character, location, object, organization, player, fable) with summary and sections |
-| `create_tome_story_page` | Creates a scene or a chapter in the story tree |
+| `create_tome_story_page` | Creates a scene or a chapter in the story tree, with arcanes in the scene content |
 | `update_tome_page` | Renames a Tome page, or replaces / extends its summary, content or text sections |
 | `add_tome_session_note` | Adds a session note |
 | `create_lore_page` | Creates a Lore page from a template, with its text fields |
@@ -43,6 +52,18 @@ Claude can browse your campaign tree, read an NPC or a Lore page, follow links b
 
 Text is written in light Markdown: one paragraph per line, `**bold**`, `*italic*`, `### ` / `#### ` headings, `---` separators, `- ` or `1. ` lists (indent by 2 spaces for a sub-list), `> ` quotes, and `[[Page name]]` links to existing pages (Tome or linked Lore). A missing or ambiguous link cancels the write.
 
+**Arcanes** — in scene content, a line holding only one of these inserts a new arcane, with an empty result for each game session:
+
+| Line | Arcane |
+|---|---|
+| `[[choice: Will they hand over the informant?]]` | choice (yes / no, undecided at first) |
+| `[[destiny: The Auditor finds the ship]]` | destiny (mood 1 to 5, unset at first) |
+| `[[role: One PC negotiates with the guild]]` | role (characters assigned later in Amsel) |
+| `[[options: How do they leave? \| Quietly \| By force \| With a pass]]` | options (text, then at least two options) |
+| `[[count: Imperial alert level]]` | count (starts at 0) |
+
+`read_tome_page` shows existing arcanes as `[[choice#1041e488: …]]`. Keep those lines when you rewrite a scene: the id keeps the existing arcane and its results; without it the arcane is detached from the scene.
+
 **Safeguards** — without `AMSEL_WRITE=1`, the write tools do not exist. When they are enabled, every write:
 
 - is **refused while the Tome app (for a `.tome`) or the Lore app (for a `.lore`) is open**, since the app would overwrite the change on its next save;
@@ -50,7 +71,7 @@ Text is written in light Markdown: one paragraph per line, `**bold**`, `*italic*
 - first copies the file to `.amsel-backups/` next to it (the last 20 versions are kept);
 - rewrites the archive into a temporary file, reads it back to check it, then replaces the original. Existing images are left untouched; new ones are added to `img/` and to the image library (in the folder you choose).
 
-There is no deletion yet, and arcanes, relations and runes cannot be edited. Images come from local files: an online image must be downloaded first.
+There is no deletion yet; the results of existing arcanes, relations and runes cannot be edited. Images come from local files: an online image must be downloaded first.
 
 Files and pages are referenced by name, partial name or id (or the start of an id). Amsel links appear as `[[Page name]]`.
 
@@ -111,7 +132,7 @@ In `claude_desktop_config.json`:
 - **Tome** (`lastVer` 24): `storyPages` (types `TSP_Story`, `TSP_ChapterFlow`, `TSP_Chapter`, `TSP_Scene`, tree via `parentId` / `childrenIds`), `dataPages` (`TDP_Character`, `TDP_Location`, `TDP_Object`, `TDP_Organization`, `TDP_Player`, `TDP_Fable`, with `text` or `checker` sub-pages), `arcanes` (`choice` / `destiny`), `gameSessions`, `notes`, `linkedLorePath`. Page covers: `coverImage.relatedImage`.
 - **Lore** (`lastVer` 17): `pages` (content per module via `relatedModuleId`; images via `visualContent.relatedImage`), `templates` (modules `LM_Standard_Text`, `LM_Image`, `LM_Rune`, `LM_Mirror`), `runeTemplates`, `diagrams`, `maps`.
 - **Lore kit** (`.lorekit`): the same archive with no pages or images, only `name`, `templates` and runes. Old format (`lastVer` 13): `runeTemplates[].runelets`. Newer format (`lastVer` 23): `runeGroups[].runes`, `customTemplateCategories` (custom categories referenced by id) and `inspirationLists`. The server reads both but never writes to a kit: kits are imported into a Lore from the app.
-- Rich text is HTML. Links: `<tag-component id="lorePage/…">` (Lore page), `index/…` (Tome data page), `storyPage/…`; embedded arcanes: `<destiny-component idhash="…">`, `<intrigue-component …>`.
+- Rich text is HTML. Links: `<tag-component id="lorePage/…">` (Lore page), `index/…` (Tome data page), `storyPage/…`; embedded arcanes: `<intrigue-component idhash="…">` (choice), `<destiny-component …>`, `<role-component …>`, `<options-component …>`, `<count-component …>`. Each arcane holds one result per game session: `state` (`tbd` / `yes` / `no`), `mood` (0 = unset, 1–5), `characters`, `choices` (with `isSelected`) or `number`.
 - Linked Lore: the server first looks for a `.lore` with the same name next to the Tome (handy for copies), then for the recorded path.
 
 ## Development
@@ -128,7 +149,8 @@ Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). Changes are l
 
 - [x] Reading Tome, Lore and Lore kits
 - [x] Writing: page creation and editing, session notes, images (backups, refused while the app is open)
-- [ ] Arcanes (per-session results), relations, runes
+- [x] Creating arcanes (choice, destiny, role, options, count)
+- [ ] Editing arcane results, relations, runes
 - [ ] Page deletion
 
 ## License

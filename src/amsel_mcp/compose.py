@@ -3,6 +3,10 @@
 Supported: paragraphs (one per line, blank lines kept), ``**bold**``, ``*italic*``,
 ``### `` / ``#### `` headings, ``---`` separators, ``- `` / ``1. `` lists (indent by
 2 spaces to nest), ``> `` quotes, and ``[[Page name]]`` links to existing pages.
+
+In scene content, a line holding only ``[[choice: …]]``, ``[[destiny: …]]``, ``[[role: …]]``,
+``[[options: text | option 1 | option 2]]`` or ``[[count: …]]`` inserts an arcane; with an id
+(``[[choice#1041e488: …]]``, as shown when reading a page) it keeps that existing arcane.
 """
 
 from __future__ import annotations
@@ -13,6 +17,11 @@ from typing import Callable
 
 # name -> "kind/id"; raises ValueError when the name is unknown or ambiguous
 LinkFinder = Callable[[str], str]
+# (type, id prefix or None, text, options) -> arcane id; raises ValueError on a bad id
+ArcaneMaker = Callable[[str, "str | None", str, list], str]
+
+ARCANE_TAGS = {"choice": "intrigue", "destiny": "destiny", "role": "role", "options": "options", "count": "count"}
+_ARCANE = re.compile(r"^\[\[(choice|destiny|role|options|count)(?:#([\w-]{4,36}))?\s*(?::\s*(.*?))?\s*\]\]$", re.I)
 
 P = '<p class="text-body">{}</p>'
 _LINK = re.compile(r"\[\[([^\[\]]+)\]\]")
@@ -80,7 +89,16 @@ def _format(text: str) -> str:
     return out
 
 
-def text_to_html(text: str, find: LinkFinder | None = None) -> str:
+def inline_html(text: str, find: LinkFinder | None = None) -> str:
+    """Format one line (bold, italic, links) without a paragraph wrapper. Raises ValueError on bad links."""
+    errors: list[str] = []
+    out = _inline(text.strip(), find, errors)
+    if errors:
+        raise ValueError("Unresolved links — nothing was written:\n- " + "\n- ".join(errors))
+    return out
+
+
+def text_to_html(text: str, find: LinkFinder | None = None, arcane: ArcaneMaker | None = None) -> str:
     """Convert text to Amsel HTML. Raises ValueError listing every unresolvable link."""
     text = (text or "").replace("\r\n", "\n").strip("\n")
     if not text.strip():
@@ -94,6 +112,21 @@ def text_to_html(text: str, find: LinkFinder | None = None) -> str:
 
     while i < len(lines):
         line = lines[i]
+        am = _ARCANE.match(line.strip())
+        if am:
+            kind, ref, body = am.group(1).lower(), am.group(2), am.group(3) or ""
+            if arcane is None:
+                errors.append(f"{line.strip()}: arcanes can only be inserted in scene content")
+            else:
+                parts = [p.strip() for p in body.split("|")] if kind == "options" else [body.strip()]
+                try:
+                    aid = arcane(kind, ref, parts[0], [p for p in parts[1:] if p])
+                    tag = ARCANE_TAGS[kind]
+                    out.append(f'<{tag}-component idhash="{aid}"></{tag}-component>')
+                except ValueError as exc:
+                    errors.append(f"{line.strip()}: {exc}")
+            i += 1
+            continue
         if _list_item(line):
             items = []
             while i < len(lines) and _list_item(lines[i]):

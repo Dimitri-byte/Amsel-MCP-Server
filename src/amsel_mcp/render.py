@@ -142,9 +142,17 @@ def tome_arcanes(tome: Tome, lore: Lore | None, arcane_type: str | None = None) 
             sess = tome.sessions.get(r.get("relatedSessionIdHash"), "session ?")
             bits = []
             if "state" in r:
-                bits.append(f"result: {r['state']}")
+                bits.append("result: not decided yet" if r["state"] == "tbd" else f"result: {r['state']}")
             if "mood" in r:
-                bits.append(f"mood: {r['mood']}")
+                bits.append("mood: not set" if not r["mood"] else f"mood: {r['mood']}/5")
+            if "characters" in r:
+                names = [ctx.name_of_id(c.get("idHash", "")) for c in r["characters"]]
+                bits.append("characters: " + (", ".join(f"[[{n}]]" for n in names) if names else "none yet"))
+            if "choices" in r:
+                bits.append("options: " + " / ".join(
+                    (f"**{c.get('content', '')}** (chosen)" if c.get("isSelected") else c.get("content", "")) for c in r["choices"]))
+            if "number" in r:
+                bits.append(f"count: {r['number']}")
             com = html_to_text(r.get("commentary"), ctx.label).replace("\n", " ")
             if com:
                 bits.append(f"note: {com}")

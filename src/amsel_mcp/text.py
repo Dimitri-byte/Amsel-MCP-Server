@@ -12,7 +12,7 @@ Resolver = Callable[[str, str], Optional[str]]
 
 _LINK_RE = re.compile(
     r'<tag-component\s+id=\\?"([A-Za-z]+)/([\w-]+)'
-    r'|<(?:destiny|intrigue)-component\s+id(?:hash)?=\\?"([\w-]+)'
+    r'|<(?:destiny|intrigue|role|options|count)-component\s+id(?:hash)?=\\?"([\w-]+)'
 )
 _BLOCKS = {"p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre"}
 
@@ -93,9 +93,11 @@ class _Converter(HTMLParser):
         elif tag == "tag-component":
             kind, _, ref = (a.get("id") or "").partition("/")
             self.out.append(self._link(kind, ref))
-        elif tag in ("destiny-component", "intrigue-component"):
+        elif tag in ("destiny-component", "intrigue-component", "role-component", "options-component", "count-component"):
             ref = a.get("idhash") or a.get("id") or ""
+            self._nl(2)  # arcanes are blocks: one per line, so a rewritten scene keeps them
             self.out.append(self._link("arcane", ref))
+            self._nl(2)
 
     def handle_endtag(self, tag):
         if tag == "blockquote":

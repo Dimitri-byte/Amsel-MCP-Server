@@ -265,3 +265,53 @@ def test_set_tome_page_image_sets_cover(server, campaign_dir, tmp_path_factory):
     assert entry["extension"] == "webp" and data["imageFolders"][0]["isRootFolder"]
     npc = next(p for p in data["dataPages"] if p["pageName"] == "PNJ : Mirelle")
     assert npc["coverImage"]["relatedImage"] == entry["idHash"]
+
+
+# --- arcanes ------------------------------------------------------------------
+
+def test_scene_content_creates_every_arcane_type(server, campaign_dir):
+    from .conftest import SESSION
+    content = (
+        "Ouverture.\n"
+        "[[choice: Livrer [[Mirelle]] ?]]\n"
+        "[[destiny: La Taverne brûle]]\n"
+        "[[role: Négocier avec la guilde]]\n"
+        "[[options: Trois fins | Fuite | Combat | Accord]]\n"
+        "[[count: Alertes]]"
+    )
+    out = server.create_tome_story_page("campagne", "Chapitre 1", "Le pacte", content=content)
+    data = read_data_json(campaign_dir / "Campagne.tome")
+    scene = next(p for p in data["storyPages"] if p["pageName"] == "Le pacte")
+    new = data["arcanes"][-5:]
+    assert [a["type"] for a in new] == ["choice", "destiny", "role", "options", "count"]
+    for a, tag in zip(new, ["intrigue", "destiny", "role", "options", "count"]):
+        assert f'<{tag}-component idhash="{a["idHash"]}"></{tag}-component>' in scene["content"]
+        assert [r["relatedSessionIdHash"] for r in a["results"]] == [SESSION]
+    choice, destiny, role, options, count = new
+    assert f"index/{T_NPC}" in choice["text"] and choice["results"][0]["state"] == "tbd"
+    assert destiny["results"][0]["mood"] == 0 and role["results"][0]["characters"] == []
+    assert [c["content"] for c in options["results"][0]["choices"]] == ["Fuite", "Combat", "Accord"]
+    assert options["text"] == "<p>Trois fins</p>" and not any(c["isSelected"] for c in options["results"][0]["choices"])
+    assert count["text"] == "<p>Alertes</p>" and count["results"][0]["number"] == 0
+    assert f"[[options#{options['idHash'][:8]}: Trois fins | Fuite | Combat | Accord]]" in out
+    listing = server.list_tome_arcanes("campagne")
+    assert "result: not decided yet" in listing and "count: 0" in listing and "Fuite / Combat / Accord" in listing
+
+
+def test_rewriting_scene_keeps_arcanes_by_id(server, campaign_dir):
+    tome = campaign_dir / "Campagne.tome"
+    before = len(read_data_json(tome)["arcanes"])
+    server.update_tome_page("campagne", "Arrivée au port", content="Nouveau texte.\n[[choice#ta000001: ignoré]]")
+    data = read_data_json(tome)
+    scene = next(p for p in data["storyPages"] if p["pageName"] == "Arrivée au port")
+    assert len(data["arcanes"]) == before and '<intrigue-component idhash="ta000001-choice">' in scene["content"]
+    raw = tome.read_bytes()
+    with pytest.raises(ValueError, match="no arcane with this id"):
+        server.update_tome_page("campagne", "Arrivée au port", content="[[choice#ffffffff: x]]")
+    with pytest.raises(ValueError, match="not a destiny"):
+        server.update_tome_page("campagne", "Arrivée au port", content="[[destiny#ta000001: x]]")
+    with pytest.raises(ValueError, match="at least two options"):
+        server.update_tome_page("campagne", "Arrivée au port", content="[[options: seul | A]]")
+    with pytest.raises(ValueError, match="only be inserted in scene content"):
+        server.update_tome_page("campagne", "Mirelle", sections={"Résumé": "[[choice: x]]"})
+    assert tome.read_bytes() == raw
